@@ -9,11 +9,11 @@ import uuid
 from optparse import OptionParser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-from utils.exceptions import BadValueError
-from utils import *
-from scoring import *
-from fields import *
+from exceptions import ValidationError
+from utils import alt_name, check_pairs
+from scoring import get_score, get_interests
 from constants import *
+from fields import *
 
 
 class RequestMeta(type):
@@ -50,7 +50,7 @@ class BasicRequest(metaclass=RequestMeta):
                 prop = getattr(cls, field)
                 if not isinstance(prop, Field):
                     raise TypeError(f'Cannot set non-property {field}')
-                prop._validate(value)
+                prop.validate(value)
                 setattr(self, field, value)
             else:
                 setattr(self, field, None)
@@ -95,7 +95,7 @@ def check_auth(request):
 def online_score_handler(method_request, ctx, store):
     try:
         user_info = OnlineScoreRequest(**method_request.arguments)
-    except BadValueError as e:
+    except ValidationError as e:
         logging.error(str(e), ctx)
         return str(e), INVALID_REQUEST, ctx
     ctx.update({'has': list(method_request.arguments.keys())})
@@ -120,7 +120,7 @@ def online_score_handler(method_request, ctx, store):
 def clients_interests_handler(method_request, ctx, store):
     try:
         user_info = ClientsInterestsRequest(**method_request.arguments)
-    except BadValueError as e:
+    except ValidationError as e:
         logging.error(str(e), ctx)
         return str(e), INVALID_REQUEST, ctx
     ctx.update({'nclients': len(user_info.client_ids)})
@@ -132,7 +132,7 @@ def method_handler(request, ctx, store):
     response, code = None, OK
     try:
         method_request = MethodRequest(**request['body'])
-    except BadValueError as e:
+    except ValidationError as e:
         logging.error(str(e), ctx)
         return str(e), INVALID_REQUEST, ctx
     if not check_auth(method_request):

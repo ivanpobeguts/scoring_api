@@ -1,6 +1,6 @@
 import datetime
 
-from utils.exceptions import BadValueError
+from exceptions import ValidationError
 from utils import prettify_dict
 from constants import GENDERS
 
@@ -23,75 +23,75 @@ class Field:
         self.required = required
         self.nullable = nullable
 
-    def _validate(self, value):
+    def validate(self, value):
         if value is None and not self.nullable:
-            raise BadValueError('Field cannot be null')
+            raise ValidationError('Field cannot be null')
         if not value and self.required:
-            raise BadValueError('Field is required')
+            raise ValidationError('Field is required')
 
 
 class CharField(Field):
-    def _validate(self, value):
+    def validate(self, value):
         if not isinstance(value, str):
-            raise BadValueError('Field is not a string')
-        super()._validate(value)
+            raise ValidationError('Field is not a string')
+        super().validate(value)
 
 
 class ArgumentsField(Field):
-    def _validate(self, value):
+    def validate(self, value):
         if not isinstance(value, dict):
-            raise BadValueError('Field is not a dict')
-        super()._validate(value)
+            raise ValidationError('Field is not a dict')
+        super().validate(value)
 
 
 class EmailField(CharField):
-    def _validate(self, value):
-        super()._validate(value)
+    def validate(self, value):
+        super().validate(value)
         if not '@' in value:
-            raise BadValueError('No @ in email')
+            raise ValidationError('No @ in email')
 
 
 class PhoneField(Field):
     number_length = 11
 
-    def _validate(self, value):
+    def validate(self, value):
         if not isinstance(value, (str, int)):
-            raise BadValueError('Phone must be a string or number')
-        super()._validate(value)
+            raise ValidationError('Phone must be a string or number')
+        super().validate(value)
         if len(str(value)) != self.number_length:
-            raise BadValueError(f'Phone length must be {self.number_length}')
+            raise ValidationError(f'Phone length must be {self.number_length}')
         if not str(value).startswith('7'):
-            raise BadValueError('Phone must start with 7')
+            raise ValidationError('Phone must start with 7')
 
 
 class DateField(Field):
-    def _validate(self, value):
-        super()._validate(value)
+    def validate(self, value):
+        super().validate(value)
         try:
             datetime.datetime.strptime(value, '%d.%m.%Y')
         except ValueError:
-            raise BadValueError('Incorrect date format, DD.MM.YYYY expected')
+            raise ValidationError('Incorrect date format, DD.MM.YYYY expected')
 
 
 class BirthDayField(DateField):
-    def _validate(self, value):
-        super()._validate(value)
+    def validate(self, value):
+        super().validate(value)
         bdate = datetime.datetime.strptime(value, '%d.%m.%Y')
         if datetime.datetime.now().year - bdate.year > 70:
-            raise BadValueError('The age cannot be greater than 70')
+            raise ValidationError('The age cannot be greater than 70')
 
 
 class GenderField(Field):
-    def _validate(self, value):
-        super()._validate(value)
+    def validate(self, value):
+        super().validate(value)
         if not isinstance(value, int):
-            raise BadValueError('Gender must contain only numbers')
+            raise ValidationError('Gender must contain only numbers')
         if value not in GENDERS:
-            raise BadValueError(f'Gender must contain only numbers from: {prettify_dict(GENDERS)}')
+            raise ValidationError(f'Gender must contain only numbers from: {prettify_dict(GENDERS)}')
 
 
 class ClientIDsField(Field):
-    def _validate(self, value):
-        super()._validate(value)
+    def validate(self, value):
+        super().validate(value)
         if not isinstance(value, list) and not all(isinstance(x, int) for x in value):
-            raise BadValueError('Client ids must be a list of integers')
+            raise ValidationError('Client ids must be a list of integers')
