@@ -12,6 +12,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from exceptions import ValidationError
 from utils import alt_name, check_pairs
 from scoring import get_score, get_interests
+from store import RedisStore
 from constants import *
 from fields import *
 
@@ -152,7 +153,7 @@ class MainHTTPHandler(BaseHTTPRequestHandler):
     router = {
         "method": method_handler
     }
-    store = None
+    store = RedisStore()
 
     def get_request_id(self, headers):
         return headers.get('HTTP_X_REQUEST_ID', uuid.uuid4().hex)
