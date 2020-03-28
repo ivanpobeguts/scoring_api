@@ -46,15 +46,12 @@ class BasicRequest(metaclass=RequestMeta):
     def _set_attributes(self, kwargs):
         cls = type(self)
         for field in self._fields:
-            if field in kwargs:
-                value = kwargs[field]
-                prop = getattr(cls, field)
-                if not isinstance(prop, Field):
-                    raise TypeError(f'Cannot set non-property {field}')
-                prop.validate(value)
-                setattr(self, field, value)
-            else:
-                setattr(self, field, None)
+            value = kwargs.get(field)
+            prop = getattr(cls, field)
+            if not isinstance(prop, Field):
+                raise TypeError(f'Cannot set non-property {field}')
+            prop.validate(value)
+            setattr(self, field, value)
 
 
 class ClientsInterestsRequest(BasicRequest):
@@ -105,7 +102,7 @@ def online_score_handler(method_request, ctx, store):
         logging.error(str(error_msg), ctx)
         return error_msg, INVALID_REQUEST, ctx
     if method_request.is_admin:
-        return 42, OK, ctx
+        return {"score": 42}, OK, ctx
     score = get_score(
         store=store,
         phone=user_info.phone,
@@ -115,7 +112,7 @@ def online_score_handler(method_request, ctx, store):
         first_name=user_info.first_name,
         last_name=user_info.last_name
     )
-    return json.dumps({"score": score}), OK, ctx
+    return {"score": score}, OK, ctx
 
 
 def clients_interests_handler(method_request, ctx, store):
@@ -126,7 +123,7 @@ def clients_interests_handler(method_request, ctx, store):
         return str(e), INVALID_REQUEST, ctx
     ctx.update({'nclients': len(user_info.client_ids)})
     interests = {cid: get_interests(store, cid) for cid in user_info.client_ids}
-    return json.dumps(interests), OK, ctx
+    return interests, OK, ctx
 
 
 def method_handler(request, ctx, store):

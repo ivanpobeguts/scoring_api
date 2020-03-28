@@ -12,8 +12,8 @@ def prettify_dict(d):
 
 
 def check_pairs(user_info):
-    if not (user_info.phone and user_info.email) or not (user_info.first_name and user_info.last_name) or not (
-            user_info.gender and user_info.birthday):
+    if not any([(user_info.phone and user_info.email), (user_info.first_name and user_info.last_name),
+               (user_info.gender and user_info.birthday)]):
         return False
     return True
 
@@ -31,5 +31,7 @@ def redis_retry(max_retries):
                     if count > max_retries:
                         raise
                     time.sleep(2)
+
         return wrapper
+
     return retry
