@@ -21,6 +21,12 @@ $ curl -X POST -H "Content-Type: application/json" -d '{"account": "horns&hoofs"
 {"response": "{\"1\": [\"travel\", \"cinema\"], \"2\": [\"pets\", \"travel\"], \"3\": [\"hi-tech\", \"sport\"], \"4\": [\"cars\", \"geek\"]}", "code": 200}
 ```
 
+## Environment
+Create virtualenv and install requirements with following command from the root folder:
+```bash
+$ pip install -r requirements.txt
+```
+
 ## How to run server
 
 Script requires python >= 3.7.
@@ -30,4 +36,11 @@ Run server with the following command:
 ```bash
 $ python api.py --port <server port> --log <log path>
 ```
+
+## Tests
+Both unit and integration tests can be run with following command from the root folder:
+```bash
+$ pytest
+```
+
 

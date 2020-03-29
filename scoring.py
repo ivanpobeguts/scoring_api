@@ -1,18 +1,24 @@
+import logging
 import hashlib
 import json
+import redis
 
 
 def get_score(store, phone, email, birthday=None, gender=None, first_name=None, last_name=None):
     key_parts = [
-        first_name or "",
-        last_name or "",
-        phone or "",
-        birthday.strftime("%Y%m%d") if birthday is not None else "",
+        first_name or '',
+        last_name or '',
+        str(phone) or '',
+        birthday or '',
     ]
-    key = "uid:" + hashlib.md5("".join(key_parts).encode()).hexdigest()
+    key = 'uid:' + hashlib.md5(''.join(key_parts).encode()).hexdigest()
     # try get from cache,
     # fallback to heavy calculation in case of cache miss
-    score = store.cache_get(key) or 0
+    score = 0
+    try:
+        score = store.cache_get(key) or score
+    except redis.ConnectionError:
+        logging.error('Cannot connect to Redis cache')
     if score:
         return score
     if phone:
@@ -29,5 +35,5 @@ def get_score(store, phone, email, birthday=None, gender=None, first_name=None, 
 
 
 def get_interests(store, cid):
-    r = store.get("i:%s" % cid)
+    r = store.get(f'i:{cid}')
     return json.loads(r) if r else []

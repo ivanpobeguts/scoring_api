@@ -13,7 +13,7 @@ def prettify_dict(d):
 
 def check_pairs(user_info):
     if not any([(user_info.phone and user_info.email), (user_info.first_name and user_info.last_name),
-               (user_info.gender and user_info.birthday)]):
+               (user_info.gender is not None and user_info.birthday)]):
         return False
     return True
 

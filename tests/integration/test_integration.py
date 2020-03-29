@@ -2,6 +2,7 @@ import hashlib
 import datetime
 import functools
 import unittest
+from mock import Mock
 
 import api
 
@@ -29,10 +30,9 @@ class TestSuite(unittest.TestCase):
     def setUp(self):
         self.context = {}
         self.headers = {}
-        self.settings = {}
 
-    def get_response(self, request):
-        return api.method_handler({"body": request, "headers": self.headers}, self.context, self.settings)
+    def get_response(self, request, store={}):
+        return api.method_handler({"body": request, "headers": self.headers}, self.context, store)
 
     def set_valid_auth(self, request):
         if request.get("login") == api.ADMIN_LOGIN:
@@ -99,9 +99,11 @@ class TestSuite(unittest.TestCase):
          "first_name": "a", "last_name": "b"},
     ])
     def test_ok_score_request(self, arguments):
+        store = Mock()
+        store.cache_get.return_value = 10
         request = {"account": "horns&hoofs", "login": "h&f", "method": "online_score", "arguments": arguments}
         self.set_valid_auth(request)
-        response, code, _ = self.get_response(request)
+        response, code, _ = self.get_response(request, store)
         self.assertEqual(api.OK, code, arguments)
         score = response.get("score")
         self.assertTrue(isinstance(score, (int, float)) and score >= 0, arguments)
@@ -138,8 +140,14 @@ class TestSuite(unittest.TestCase):
     ])
     def test_ok_interests_request(self, arguments):
         request = {"account": "horns&hoofs", "login": "h&f", "method": "clients_interests", "arguments": arguments}
+        store = {
+            'i:0': '["interest1", "interest2"]',
+            'i:1': '["interest1", "interest2"]',
+            'i:2': '["interest1", "interest2"]',
+            'i:3': '["interest1", "interest2"]',
+        }
         self.set_valid_auth(request)
-        response, code, _ = self.get_response(request)
+        response, code, _ = self.get_response(request, store)
         self.assertEqual(api.OK, code, arguments)
         self.assertEqual(len(arguments["client_ids"]), len(response))
         self.assertTrue(all(v and isinstance(v, list) and all(isinstance(i, str) for i in v)
