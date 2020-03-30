@@ -26,6 +26,10 @@ Create virtualenv and install requirements with following command from the root 
 ```bash
 $ pip install -r requirements.txt
 ```
+Start redis store instance:
+```bash
+$ docker-compose up
+```
 
 ## How to run server
 
