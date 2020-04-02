@@ -42,6 +42,10 @@ $ python api.py --port <server port> --log <log path>
 ```
 
 ## Tests
+Before running you need to start redis instance (for integration tests):
+```bash
+$ docker-compose up
+```
 Both unit and integration tests can be run with following command from the root folder:
 ```bash
 $ pytest
