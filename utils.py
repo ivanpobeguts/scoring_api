@@ -18,20 +18,17 @@ def check_pairs(user_info):
     return True
 
 
-def redis_retry(max_retries, delay):
-    def retry(func):
-        def wrapper(*args, **kwargs):
-            count = 0
-            while True:
-                try:
-                    return func(*args, **kwargs)
-                except redis.ConnectionError:
-                    logging.warning('Cannot connect to localhost:6379. Trying again in 2 seconds...')
-                    count += 1
-                    if count > max_retries:
-                        raise
-                    time.sleep(delay)
+def redis_retry(func):
+    def wrapper(self, *args, **kwargs):
+        count = 0
+        while True:
+            try:
+                return func(self, *args, **kwargs)
+            except redis.ConnectionError:
+                logging.warning('Cannot connect to localhost:6379. Trying again in 2 seconds...')
+                count += 1
+                if count > self.max_retry_count:
+                    raise
+                time.sleep(self.retry_delay)
 
-        return wrapper
-
-    return retry
+    return wrapper

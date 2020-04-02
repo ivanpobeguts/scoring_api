@@ -27,7 +27,7 @@ from exceptions import ValidationError
 )
 def test_charfield_valid(required, nullable, value):
     field = CharField(required, nullable)
-    field.validate(value)
+    assert not field.validate(value)
 
 
 @pytest.mark.parametrize(
@@ -65,7 +65,7 @@ def test_charfield_not_valid(required, nullable, value, ex_mes):
 )
 def test_argumentsfield_valid(required, nullable, value):
     field = ArgumentsField(required, nullable)
-    field.validate(value)
+    assert not field.validate(value)
 
 
 @pytest.mark.parametrize(
@@ -101,7 +101,7 @@ def test_argumentsfield_not_valid(required, nullable, value, ex_mes):
 )
 def test_emailsfield_valid(required, nullable, value):
     field = EmailField(required, nullable)
-    field.validate(value)
+    assert not field.validate(value)
 
 
 @pytest.mark.parametrize(
@@ -141,7 +141,7 @@ def test_emailfield_not_valid(required, nullable, value, ex_mes):
 )
 def test_phonesfield_valid(required, nullable, value):
     field = PhoneField(required, nullable)
-    field.validate(value)
+    assert not field.validate(value)
 
 
 @pytest.mark.parametrize(
@@ -181,7 +181,7 @@ def test_phonefield_not_valid(required, nullable, value, ex_mes):
 )
 def test_datefield_valid(required, nullable, value):
     field = DateField(required, nullable)
-    field.validate(value)
+    assert not field.validate(value)
 
 
 @pytest.mark.parametrize(
@@ -216,7 +216,7 @@ def test_datefield_not_valid(required, nullable, value, ex_mes):
 )
 def test_birthdayfield_valid(required, nullable, value):
     field = BirthDayField(required, nullable)
-    field.validate(value)
+    assert not field.validate(value)
 
 
 @pytest.mark.parametrize(
@@ -253,7 +253,7 @@ def test_birthdayfield_not_valid(required, nullable, value, ex_mes):
 )
 def test_genderfield_valid(required, nullable, value):
     field = GenderField(required, nullable)
-    field.validate(value)
+    assert not field.validate(value)
 
 
 @pytest.mark.parametrize(
@@ -289,7 +289,7 @@ def test_genderfield_not_valid(required, nullable, value, ex_mes):
 )
 def test_clientidsfield_valid(required, nullable, value):
     field = ClientIDsField(required, nullable)
-    field.validate(value)
+    assert not field.validate(value)
 
 
 @pytest.mark.parametrize(
