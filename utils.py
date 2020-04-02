@@ -18,7 +18,7 @@ def check_pairs(user_info):
     return True
 
 
-def redis_retry(max_retries):
+def redis_retry(max_retries, delay):
     def retry(func):
         def wrapper(*args, **kwargs):
             count = 0
@@ -30,7 +30,7 @@ def redis_retry(max_retries):
                     count += 1
                     if count > max_retries:
                         raise
-                    time.sleep(2)
+                    time.sleep(delay)
 
         return wrapper
 
